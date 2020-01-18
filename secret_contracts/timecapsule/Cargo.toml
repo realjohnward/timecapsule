@@ -1,8 +1,8 @@
 [package]
 name = "contract"
 version = "0.1.0"
-authors = ["Laura Weindorf <lauraweindorf@gmail.com>"]
-edition = "2018"
+authors = ["John Ward <jtward@uark.edu>"]
+edition = "2020"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

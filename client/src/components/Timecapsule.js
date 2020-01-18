@@ -14,45 +14,71 @@ import TextField from "@material-ui/core/TextField/TextField";
 // Imports - Components
 import Notifier, {openSnackbar} from "./Notifier";
 // Imports - Reducers (Redux)
-import { computeRichestMillionaire } from "../actions";
 // Imports - enigma-js client library utility packages
 import { utils, eeConstants } from 'enigma-js';
+import { GetSecret } from "../actions";
+
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-class MillionairesProblem extends Component {
+class Timecapsule extends Component {
     constructor(props) {
         super(props);
-        this.onAddMillionaire = this.onAddMillionaire.bind(this);
-        this.onComputeRichest = this.onComputeRichest.bind(this);
+        this.onAddSecret = this.onAddSecret.bind(this);
+        this.onGetSecret = this.onGetSecret.bind(this);
     }
 
     // Redux form/material-ui render address select component
-    static renderAddressInput({input, label, meta: { touched, error }, children, ...custom }) {
+    static renderAddressInput({label, input, meta: { touched, invalid, error }, ...custom }) {
         return (
-            <div>
-                <FormControl error={touched && error} fullWidth>
-                    <Select
-                        native
-                        {...input}
-                        {...custom}
-                        inputProps={{
-                            name: 'millionaireAddress',
-                            id: 'millionaire-address'
-                        }}
-                    >
-                        {children}
-                    </Select>
-                </FormControl>
-            </div>
+            <TextField
+                label={label}
+                type="text"
+                placeholder={label}
+                error={touched && invalid}
+                helperText={touched && error}
+                {...input}
+                {...custom}
+                fullWidth
+            />
+        )
+    }
 
+    // Redux form/material-ui render secret text field component
+    static renderSecretInput({label, input, meta: { touched, invalid, error }, ...custom }) {
+        return (
+            <TextField
+                label={label}
+                type="text"
+                placeholder={label}
+                error={touched && invalid}
+                helperText={touched && error}
+                {...input}
+                {...custom}
+                fullWidth
+            />
         )
     }
 
     // Redux form/material-ui render net worth text field component
-    static renderNetWorthInput({label, input, meta: { touched, invalid, error }, ...custom }) {
+    static renderTimestampInput({label, input, meta: { touched, invalid, error }, ...custom }) {
+        return (
+            <TextField
+                label={label}
+                type="number"
+                placeholder={label}
+                error={touched && invalid}
+                helperText={touched && error}
+                {...input}
+                {...custom}
+                fullWidth
+            />
+        )
+    }
+
+    static renderSecretsIndexInput({label, input, meta: { touched, invalid, error }, ...custom }) {
         return (
             <TextField
                 label={label}
@@ -68,7 +94,7 @@ class MillionairesProblem extends Component {
     }
 
     // Redux form callback when add millionaire info is submitted
-    async onAddMillionaire({ millionaireAddress, millionaireNetWorth } ) {
+    async onAddSecret({ myAddress, mySecret, myTimestamp } ) {
         // Create compute task metadata
         // computeTask(
         //      fn - the signature of the function we are calling (Solidity-types, no spaces)
@@ -78,27 +104,28 @@ class MillionairesProblem extends Component {
         //      sender - Ethereum address deploying the contract
         //      scAddr - the secret contract address for which this computation task belongs to
         // )
-        const taskFn = 'add_millionaire(address,uint256)';
+        const taskFn = 'add_secret(address,bytes32,uint256)';
         const taskArgs = [
-            [millionaireAddress, 'address'],
-            [millionaireNetWorth, 'uint256'],
+            [myAddress, 'address'],
+            [mySecret, 'bytes32'],
+            [myTimestamp, 'uint256']
         ];
         const taskGasLimit = 10000000;
         const taskGasPx = utils.toGrains(1e-7);
         let task = await new Promise((resolve, reject) => {
-            this.props.enigma.computeTask(taskFn, taskArgs, taskGasLimit, taskGasPx, millionaireAddress,
-                this.props.deployedMillionairesProblem)
+            this.props.enigma.computeTask(taskFn, taskArgs, taskGasLimit, taskGasPx, myAddress,
+                this.props.deployedTimecapsule)
                 .on(eeConstants.SEND_TASK_INPUT_RESULT, (result) => resolve(result))
                 .on(eeConstants.ERROR, (error) => {
                     if (error.hasOwnProperty('message')){
                         openSnackbar({ message: error.message});
                     } else {
-                        openSnackbar({ message: 'Failed to add millionaire'});
+                        openSnackbar({ message: 'Failed to add secret'});
                     }
                     reject(error);
                 });
         });
-        openSnackbar({ message: 'Task pending: adding millionaire' });
+        openSnackbar({ message: 'Task pending: adding secret' });
         while (task.ethStatus === 1) {
             // Poll for task record status and finality on Ethereum after worker has finished computation
             task = await this.props.enigma.getTaskRecordStatus(task);
@@ -106,40 +133,40 @@ class MillionairesProblem extends Component {
         }
         // ethStatus === 2 means task has successfully been computed and committed on Ethereum
         task.ethStatus === 2 ?
-            openSnackbar({ message: 'Task succeeded: added millionaire' })
+            openSnackbar({ message: 'Task succeeded: added secret' })
             :
-            openSnackbar({ message: 'Task failed: did not add millionaire' })
+            openSnackbar({ message: 'Task failed: did not add secret' })
         ;
-        this.props.reset('addMillionaire');
+        this.props.reset('AddSecret');
     }
 
     // Callback when compute richest button is clicked
-    async onComputeRichest() {
+    async onGetSecret(_index) {
         // Create compute task metadata
-        const taskFn = 'compute_richest()';
-        const taskArgs = [];
+        const taskFn = 'get_secret(uint)';
+        const taskArgs = [_index];
         const taskGasLimit = 10000000;
         const taskGasPx = utils.toGrains(1e-7);
         let task = await new Promise((resolve, reject) => {
             this.props.enigma.computeTask(taskFn, taskArgs, taskGasLimit, taskGasPx, this.props.accounts[0],
-                this.props.deployedMillionairesProblem)
+                this.props.deployedTimecapsule)
                 .on(eeConstants.SEND_TASK_INPUT_RESULT, (result) => resolve(result))
                 .on(eeConstants.ERROR, (error) => {
                     if (error.hasOwnProperty('message')){
                         openSnackbar({ message: error.message});
                     } else {
-                        openSnackbar({ message: 'Failed to compute richest'});
+                        openSnackbar({ message: 'Failed to retrieve secret.'});
                     }
                     reject(error);
                 });
         });
-        openSnackbar({ message: 'Task pending: computing richest millionaire' });
+        openSnackbar({ message: 'Task pending: retrieve secret.' });
         while (task.ethStatus === 1) {
             task = await this.props.enigma.getTaskRecordStatus(task);
             await sleep(1000);
         }
         if (task.ethStatus === 2) {
-            openSnackbar({ message: 'Task succeeded: computed richest millionaire' });
+            openSnackbar({ message: 'Task succeeded: retrieved secret.' });
             // Get task result by passing in existing task - obtains the encrypted, abi-encoded output
             task = await new Promise((resolve, reject) => {
                 this.props.enigma.getTaskResult(task)
@@ -148,22 +175,17 @@ class MillionairesProblem extends Component {
             });
             // Decrypt the task result - obtains the decrypted, abi-encoded output
             task = await this.props.enigma.decryptTaskResult(task);
-            // Abi-decode the output to its desired components
-            const richestMillionaireAddress = this.props.enigma.web3.eth.abi.decodeParameters([{
-                type: 'address',
-                name: 'richestMillionaire',
-            }], task.decryptedOutput).richestMillionaire;
-            this.props.computeRichestMillionaire(richestMillionaireAddress);
+            console.log(`decrypted output: ${task.decryptedOutput}`);
         } else {
-            openSnackbar({ message: 'Task failed: did not compute richest millionaire' });
+            openSnackbar({ message: 'Task failed: could not retrieve secret.' });
         }
     }
 
     render() {
-        if (this.props.deployedMillionairesProblem === null) {
+        if (this.props.deployedTimecapsule === null) {
             return (
                 <div>
-                    <Message color="red">Millionaires' Problem secret contract not yet deployed...</Message>
+                    <Message color="red">Timecapsule secret contract not yet deployed...</Message>
                 </div>
             )
         }
@@ -171,18 +193,18 @@ class MillionairesProblem extends Component {
             <div>
                 <Grid container spacing={3}>
                     <Grid item xs={12}>
-                        <h3>Millionaires Problem Secret Contract Address: {this.props.deployedMillionairesProblem}</h3>
+                        <h3>Timecapsule Contract Address: {this.props.deployedTimecapsule}</h3>
                     </Grid>
                     <Grid item xs={6}>
                         <div>
                             <Notifier />
-                            <h4>Enter Millionaire Details</h4>
+                            <h4>Enter Secret Details</h4>
                             <form>
                                 <div>
-                                    <InputLabel htmlFor="millionaire-address">Address</InputLabel>
+                                    <InputLabel htmlFor="my-address">Address</InputLabel>
                                     <Field
-                                        name="millionaireAddress"
-                                        component={MillionairesProblem.renderAddressInput}
+                                        name="myAddress"
+                                        component={Timecapsule.renderAddressInput}
                                     >
                                         <option value="" />
                                         {this.props.accounts.map((account, i) => {
@@ -194,15 +216,22 @@ class MillionairesProblem extends Component {
                                 </div>
                                 <div>
                                     <Field
-                                        name="millionaireNetWorth"
-                                        component={MillionairesProblem.renderNetWorthInput}
-                                        label="Net Worth"
+                                        name="mySecret"
+                                        component={Timecapsule.renderSecretInput}
+                                        label="Secret"
+                                    />
+                                </div>
+                                <div>
+                                    <Field
+                                        name="myTimestamp"
+                                        component={Timecapsule.renderTimestampInput}
+                                        label="Timestamp"
                                     />
                                 </div>
                                 <br />
                                 <div>
                                     <Button
-                                        onClick={this.props.handleSubmit(this.onAddMillionaire)}
+                                        onClick={this.props.handleSubmit(this.onAddSecret)}
                                         variant='outlined'
                                         color='secondary'>
                                         Submit
@@ -213,21 +242,32 @@ class MillionairesProblem extends Component {
                     </Grid>
                     <Grid item xs={6}>
                         <div>
-                            <h4>Richest Millionaire</h4>
+                            <h4>Retrieved Secret</h4>
                             <p>
                                 {
-                                    this.props.richestMillionaire !== null ?
-                                        this.props.richestMillionaire
+                                    this.props.secret !== null ?
+                                        this.props.secret
                                         :
                                         "TBD"
                                 }
                             </p>
+                            <form>
+                            <div>
+                                    <Field
+                                        name="secretsIndex"
+                                        component={Timecapsule.renderSecretsIndexInput}
+                                        label="Secrets Index"
+                                    />
+                                </div>
+                            <div>
                             <Button
-                                onClick={this.onComputeRichest}
+                                onClick={this.props.handleSubmit(this.onGetSecret)}
                                 variant='contained'
                                 color='primary'>
-                                Compute Richest
+                                Get Secret
                             </Button>
+                            </div>
+                            </form>
                         </div>
                     </Grid>
                 </Grid>
@@ -239,10 +279,9 @@ const mapStateToProps = (state) => {
     return {
         enigma: state.enigma,
         accounts: state.accounts,
-        deployedMillionairesProblem: state.deployedMillionairesProblem,
-        richestMillionaire: state.richestMillionaire
+        deployedTimecapsule: state.deployedTimecapsule
     }
 };
-export default connect(mapStateToProps, { computeRichestMillionaire })(reduxForm({
-    form: 'addMillionaire',
-})(MillionairesProblem));
+export default connect(mapStateToProps, { GetSecret })(reduxForm({
+    form: 'AddSecret',
+})(Timecapsule));

@@ -19,22 +19,22 @@ const initializeAccountsReducer = (accounts = [], action) => {
     return accounts;
 };
 
-// Responds to deployMillionairesProblem action to save deployed Millionaires' Problem secret contract address
-const deployedMillionairesProblemReducer = (deployedMillionairesProblem = null, action) => {
-    if (action.type === 'MILLIONAIRES_PROBLEM_DEPLOYED') {
+// Responds to deployTimecapsule action to save deployed Millionaires' Problem secret contract address
+const deployedTimecapsuleReducer = (deployedTimecapsule = null, action) => {
+    if (action.type === 'TIMECAPSULE_DEPLOYED') {
         return action.payload;
     }
 
-    return deployedMillionairesProblem;
+    return deployedTimecapsule;
 };
 
 // Responds to computeRichestMillionaire action to save richest millionaire's address
-const computeRichestMillionaireReducer = (richestMillionaire = null, action) => {
-    if (action.type === 'RICHEST_MILLIONAIRE_COMPUTED') {
+const getSecretReducer = (secret = null, action) => {
+    if (action.type === 'SECRET_RETRIEVED') {
         return action.payload;
     }
 
-    return richestMillionaire;
+    return secret;
 };
 
 // Responds to notifyMessage action to save snackbar open status and any contained message
@@ -50,8 +50,8 @@ const notifyMessageReducer = (notification = { open: false, message: '' }, actio
 export default combineReducers({
     enigma: initializeEnigmaReducer,
     accounts: initializeAccountsReducer,
-    deployedMillionairesProblem: deployedMillionairesProblemReducer,
-    richestMillionaire: computeRichestMillionaireReducer,
+    deployedTimecapsule: deployedTimecapsuleReducer,
+    secret: getSecretReducer,
     notification: notifyMessageReducer,
     form: formReducer
 });

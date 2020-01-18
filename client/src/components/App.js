@@ -10,10 +10,10 @@ import { withStyles } from "@material-ui/core";
 import getEnigmaInit from "../utils/getEnigmaInit.js";
 // Imports - Components
 import Header from "./Header";
-import MillionairesProblem from './MillionairesProblem';
+import Timecapsule from './Timecapsule';
 import "../App.css";
 // Imports - Actions (Redux)
-import { initializeEnigma, initializeAccounts, deployMillionairesProblem } from '../actions';
+import { initializeEnigma, initializeAccounts, deployTimecapsule } from '../actions';
 
 const styles = theme => ({
     root: {
@@ -41,10 +41,10 @@ class App extends Component {
         // Create redux action to initialize set state variable containing unlocked accounts
         this.props.initializeAccounts(accounts);
         const secretContractCount = await enigma.enigmaContract.methods.countSecretContracts().call();
-        const deployedMillionairesProblemAddress = (await enigma.enigmaContract.methods
+        const deployedTimecapsuleAddress = (await enigma.enigmaContract.methods
             .getSecretContractAddresses(secretContractCount - 1, secretContractCount).call())[0];
         // Create redux action to set state variable containing deployed millionaires' problem secret contract address
-        this.props.deployMillionairesProblem(deployedMillionairesProblemAddress);
+        this.props.deployTimecapsule(deployedTimecapsuleAddress);
     }
 
     render() {
@@ -62,7 +62,7 @@ class App extends Component {
                     <br />
                     <Container>
                         <Paper>
-                            <MillionairesProblem />
+                            <Timecapsule />
                         </Paper>
                     </Container>
                 </div>
@@ -76,5 +76,5 @@ const mapStateToProps = (state) => {
 };
 
 export default connect(
-    mapStateToProps, { initializeEnigma, initializeAccounts, deployMillionairesProblem }
+    mapStateToProps, { initializeEnigma, initializeAccounts, deployTimecapsule }
 )(withStyles(styles)(App));

@@ -29,7 +29,7 @@ class Header extends Component {
                             variant="subtitle1"
                             color="inherit"
                         >
-                            Enigma Millionaires Problem DApp
+                            Timecapsule Dapp
                         </Typography>
                     </Toolbar>
                 </AppBar>

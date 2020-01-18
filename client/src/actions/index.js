@@ -18,18 +18,18 @@ export const initializeAccounts = (accounts) => {
 };
 
 // Redux action for when millionaires problem has been deployed to a particular address
-export const deployMillionairesProblem = (deployedMillionairesProblem) => {
+export const deployTimecapsule = (deployedTimecapsule) => {
     return {
-        type: 'MILLIONAIRES_PROBLEM_DEPLOYED',
-        payload: deployedMillionairesProblem
+        type: 'TIMECAPSULE_DEPLOYED',
+        payload: deployedTimecapsule
     };
 };
 
 // Redux action for when richest millionaire's address has been computed
-export const computeRichestMillionaire = (richestMillionaire) => {
+export const getSecret = (secret) => {
     return {
-        type: 'RICHEST_MILLIONAIRE_COMPUTED',
-        payload: richestMillionaire
+        type: 'SECRET_RETRIEVED',
+        payload: secret
     };
 };
 
