@@ -15,7 +15,7 @@ use std::time::SystemTime;
 static SECRETS: &Bytes32 = "secrets";
 
 // Structs
-#[derive(Serialize, Deserialize, Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Secret {
     address: H160,
     secret: Bytes32,
