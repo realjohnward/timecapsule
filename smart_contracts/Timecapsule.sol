@@ -58,15 +58,15 @@ contract Timecapsule {
        /*
        CALLABLE FUNCTION run in SGX to retrieve secret 
        */
-       function getSecret(uint256 nowTs, address _address, bytes32 _secret, uint256 _timestamp)
+       function getSecret(uint256 nowTs, string memory _secret, uint256 _timestamp)
                public
                pure
-               returns (bytes32)
+               returns (string memory)
        {
                if(_timestamp < nowTs){
                        return _secret;
                } else {
-                       return "";
+                       return "N/A";
                }
        }
 

@@ -18,12 +18,8 @@ static SECRETS: &Bytes32 = "secrets";
 #[derive(Serialize, Deserialize)]
 pub struct Secret {
     address: H160,
-    secret: Bytes32,
+    secret: str,
     timestamp: U256
-}
-
-struct Bytes32 {
-    pub store: Vec<[u8; 4]>,
 }
 
 // Public struct Contract which will consist of private and public-facing secret contract functions
@@ -39,7 +35,7 @@ impl Contract {
 // Public trait defining public-facing secret contract functions
 #[pub_interface]
 pub trait ContractInterface{
-    fn add_secret(address: H160, secret: Bytes32, timestamp: U256);
+    fn add_secret(address: H160, secret: str, timestamp: U256);
     fn get_secret(index: u8) -> Bytes32;
 }
 
@@ -47,7 +43,7 @@ pub trait ContractInterface{
 // trait implementation for the Contract struct above
 impl ContractInterface for Contract {
     #[no_mangle]
-    fn add_secret(address: H160, secret: Bytes32, timestamp: U256) {
+    fn add_secret(address: H160, secret: str, timestamp: U256) {
         let mut secrets = Self::get_secrets();
         secrets.push(Secret {
             address,
@@ -57,9 +53,11 @@ impl ContractInterface for Contract {
         write_state!(SECRETS => secrets);
     }
     #[no_mangle]
-    fn get_secret(index: u8) -> (Bytes32, U256) {
+    fn get_secret(index: u8) -> (str, U256) {
         let now = SystemTime::now();
-        let secret = Self::get_secrets()[index];
-        (secret, now)
+        let secret = Self::get_secrets()[index as usize];
+        let _secret = secret.secret;
+        let _timestamp = secret.timestamp;
+        (now, _secret, _timestamp)
     }
 }

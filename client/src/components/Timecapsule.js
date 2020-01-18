@@ -104,10 +104,10 @@ class Timecapsule extends Component {
         //      sender - Ethereum address deploying the contract
         //      scAddr - the secret contract address for which this computation task belongs to
         // )
-        const taskFn = 'add_secret(address,bytes32,uint256)';
+        const taskFn = 'add_secret(address,string,uint256)';
         const taskArgs = [
             [myAddress, 'address'],
-            [mySecret, 'bytes32'],
+            [mySecret, 'string'],
             [myTimestamp, 'uint256']
         ];
         const taskGasLimit = 10000000;
