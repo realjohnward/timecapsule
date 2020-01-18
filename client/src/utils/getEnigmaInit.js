@@ -12,7 +12,7 @@ export default async() => {
             web3,
             EnigmaContract.networks['4447'].address,
             EnigmaTokenContract.networks['4447'].address,
-            'http://localhost:3333', {
+            'http://169.47.208.222:3333', {
                 gas: 4712388,
                 gasPrice: 100000000000,
                 from: (await web3.eth.getAccounts())[0],
