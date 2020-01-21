@@ -10,59 +10,67 @@ extern crate chrono;
 use eng_wasm::*;
 use eng_wasm_derive::pub_interface;
 use serde::{Serialize, Deserialize};
-use std::time::SystemTime;
-use std::fmt;
-use chrono::offset::Utc;
-use chrono::DateTime;
+
 // Encrypted state keys
+static OWNER: &str = "owner";
 static SECRETS: &str = "secrets";
 
 // Structs
 #[derive(Serialize, Deserialize)]
 pub struct Secret {
-    address: H160,
     secret: String,
-    timestamp: U256
+    timestamp: i64,
 }
 
 // Public struct Contract which will consist of private and public-facing secret contract functions
-pub struct Contract;
+pub struct Contract; 
 
-// Private functions accessible only by the secret contract
 impl Contract {
     fn get_secrets() -> Vec<Secret> {
-        read_state!(SECRETS).unwrap_or_default()
+	read_state!(SECRETS).unwrap_or_default()
     }
 }
 
-// Public trait defining public-facing secret contract functions
 #[pub_interface]
 pub trait ContractInterface{
-    fn add_secret(address: H160, secret: String, timestamp: U256);
-    fn get_secret(index: u64) -> (String, String, U256);
+    fn construct(owner: H160);
+    fn add_secret(sender: H160, secret: String, timestamp: i64);
+    fn reveal_expired_secrets(sender: H160) -> String;
 }
 
-// Implementation of the public-facing secret contract functions defined in the ContractInterface
-// trait implementation for the Contract struct above
+// Private functions accessible only by the secret contract
 impl ContractInterface for Contract {
+    fn construct(owner: H160) {
+	write_state!(OWNER => owner);
+    }
+
     #[no_mangle]
-    fn add_secret(address: H160, secret: String, timestamp: U256) {
-        let mut secrets = Self::get_secrets();
-        secrets.push(Secret {
-            address,
-            secret,
+    fn add_secret(sender: H160, secret: String, timestamp: i64) {
+        let owner: H160 = read_state!(OWNER).unwrap();
+        assert_eq!(sender, owner);
+        let mut _secrets = Self::get_secrets();
+        _secrets.push(Secret {
+	    secret,
             timestamp,
         });
-        write_state!(SECRETS => secrets);
+        write_state!(SECRETS => _secrets);
     }
+
     #[no_mangle]
-    fn get_secret(index: u64) -> (String, String, U256) {
-        let systemtime = SystemTime::now();
-	let datetime: DateTime<Utc> = systemtime.into();
-	let now = datetime.format("%s").ToString(); 
-        let secret = Self::get_secrets()[index as usize];
-        let _secret = secret.secret;
-        let _timestamp = secret.timestamp;
-        (_now, _secret, _timestamp)
+    fn reveal_expired_secrets(sender: H160) -> String {
+	let owner: H160 = read_state!(OWNER).unwrap();
+	assert_eq!(sender, owner);
+	let now: i64 = chrono::offset::Utc::now().timestamp();
+	let mut revealed_secrets: String = String::new();
+	let separator = String::from("|");
+	let all_secrets = Self::get_secrets();
+	for one_secret in all_secrets {
+		if now > one_secret.timestamp {
+			revealed_secrets.push_str(&one_secret.secret);
+			revealed_secrets.push_str(&separator);
+		}
+	}
+	revealed_secrets.pop();
+	return revealed_secrets;
     }
 }

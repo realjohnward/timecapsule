@@ -26,7 +26,7 @@ export const deployTimecapsule = (deployedTimecapsule) => {
 };
 
 // Redux action for when richest millionaire's address has been computed
-export const getSecret = (secret) => {
+export const GetSecret = (secret) => {
     return {
         type: 'SECRET_RETRIEVED',
         payload: secret

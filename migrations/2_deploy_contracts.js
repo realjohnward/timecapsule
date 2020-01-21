@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const Web3 = require('web3');
 const dotenv = require('dotenv');
-const MillionairesProblem = artifacts.require('MillionairesProblem.sol');
 const { Enigma, utils, eeConstants } = require('enigma-js/node');
 
 dotenv.config({ path: path.resolve(process.cwd(), '..', '.env') });
@@ -82,24 +81,20 @@ module.exports = async function(deployer, network, accounts) {
         },
     );
     enigma.admin();
-
     enigma.setTaskKeyPair('cupcake');
 
     // Deploy your Smart and Secret contracts below this point:
 
-    deployer.deploy(MillionairesProblem).then(function() {
-        console.log(`Smart Contract "MillionairesProblem.Sol" has been deployed at ETH address: ${MillionairesProblem.address}`);
-        return;
-    });
-
-    let config = {
-        filename: 'millionaires_problem.wasm',
+    const config = {
+        filename: 'timecapsule.wasm',
         fn: 'construct()',
-        args: '',
+        args: [
+	    [accounts[0], 'address']
+	],
         gasLimit: 500000,
         gasPrice: utils.toGrains(1),
         from: accounts[0]
     };
-    let address = await deploySecretContract(config);
+    const address = await deploySecretContract(config);
     console.log(`Secret Contract "${config.filename}" deployed at Enigma address: ${address}`);
 };

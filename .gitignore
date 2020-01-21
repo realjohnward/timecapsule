@@ -6,6 +6,9 @@
 # testing
 /test/*.txt
 
+# quick trial & error script 
+debug_lib
+
 # production
 /build/enigma_contracts
 /build/secret_contracts
@@ -22,3 +25,5 @@ yarn-debug.log*
 yarn-error.log*
 
 .DS_Store
+
+/target

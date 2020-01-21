@@ -104,11 +104,11 @@ class Timecapsule extends Component {
         //      sender - Ethereum address deploying the contract
         //      scAddr - the secret contract address for which this computation task belongs to
         // )
-        const taskFn = 'add_secret(address,string,uint256)';
+        const taskFn = 'add_secret(address,string,int64)';
         const taskArgs = [
             [myAddress, 'address'],
             [mySecret, 'string'],
-            [myTimestamp, 'uint256']
+            [myTimestamp, 'int64']
         ];
         const taskGasLimit = 10000000;
         const taskGasPx = utils.toGrains(1e-7);
@@ -117,7 +117,8 @@ class Timecapsule extends Component {
                 this.props.deployedTimecapsule)
                 .on(eeConstants.SEND_TASK_INPUT_RESULT, (result) => resolve(result))
                 .on(eeConstants.ERROR, (error) => {
-                    if (error.hasOwnProperty('message')){
+                   console.log(`ERROR: ${error}`); 
+		   if (error.hasOwnProperty('message')){
                         openSnackbar({ message: error.message});
                     } else {
                         openSnackbar({ message: 'Failed to add secret'});
