@@ -20,7 +20,7 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-const splitMessages = decryptedOutput => {
+const splitSecrets = decryptedOutput => {
   const decodedParameters = web3.eth.abi.decodeParameters(
     [
       {
