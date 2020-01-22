@@ -63,11 +63,11 @@ contract("Timecapsule", accounts => {
     })
 
     it('should execute compute task to add secret #1', async() => {
-        let taskFn = 'add_secret(address,string,int64)';
+        let taskFn = 'add_secret(address,string,uint64)';
         let taskArgs = [
             [owner1, 'address'],
             ["Hello world 1", 'string'],
-	    [1579378831, 'int64'],
+	    [1579378831, 'uint64'],
         ];
         let taskGasLimit = 500000;
         let taskGasPx = utils.toGrains(1);
@@ -94,11 +94,11 @@ contract("Timecapsule", accounts => {
     }, 10000);
 
     it('should execute compute task to add secret #2', async () => {
-        let taskFn = 'add_secret(address,string,int64)';
+        let taskFn = 'add_secret(address,string,uint64)';
         let taskArgs = [
             [owner1, 'address'],
             ["Hello world 2", 'string'],
-	    [1579378831, 'int64'],
+	    [1579378831, 'uint64'],
         ];
         let taskGasLimit = 500000;
         let taskGasPx = utils.toGrains(1);

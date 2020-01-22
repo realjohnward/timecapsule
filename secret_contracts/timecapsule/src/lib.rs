@@ -5,10 +5,10 @@
 extern crate eng_wasm;
 extern crate eng_wasm_derive;
 extern crate serde;
-extern crate chrono;
 
 use eng_wasm::*;
 use eng_wasm_derive::pub_interface;
+use std::time::SystemTime;
 use serde::{Serialize, Deserialize};
 
 // Encrypted state keys
@@ -19,7 +19,7 @@ static SECRETS: &str = "secrets";
 #[derive(Serialize, Deserialize)]
 pub struct Secret {
     secret: String,
-    timestamp: i64,
+    timestamp: u64,
 }
 
 // Public struct Contract which will consist of private and public-facing secret contract functions
@@ -34,7 +34,7 @@ impl Contract {
 #[pub_interface]
 pub trait ContractInterface{
     fn construct(owner: H160);
-    fn add_secret(sender: H160, secret: String, timestamp: i64);
+    fn add_secret(sender: H160, secret: String, timestamp: u64);
     fn reveal_expired_secrets(sender: H160) -> String;
 }
 
@@ -45,7 +45,7 @@ impl ContractInterface for Contract {
     }
 
     #[no_mangle]
-    fn add_secret(sender: H160, secret: String, timestamp: i64) {
+    fn add_secret(sender: H160, secret: String, timestamp: u64) {
         let owner: H160 = read_state!(OWNER).unwrap();
         assert_eq!(sender, owner);
         let mut _secrets = Self::get_secrets();
@@ -60,12 +60,16 @@ impl ContractInterface for Contract {
     fn reveal_expired_secrets(sender: H160) -> String {
 	let owner: H160 = read_state!(OWNER).unwrap();
 	assert_eq!(sender, owner);
-	let now: i64 = chrono::offset::Utc::now().timestamp();
+        let _now;
+        match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
+                Ok(now) => _now = now.as_secs(),
+                Err(_) => panic!("SystemTime before UNIX EPOCH."),
+        }
 	let mut revealed_secrets: String = String::new();
 	let separator = String::from("|");
 	let all_secrets = Self::get_secrets();
 	for one_secret in all_secrets {
-		if now > one_secret.timestamp {
+		if _now > one_secret.timestamp {
 			revealed_secrets.push_str(&one_secret.secret);
 			revealed_secrets.push_str(&separator);
 		}
