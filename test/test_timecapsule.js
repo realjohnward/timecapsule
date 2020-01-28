@@ -1,4 +1,4 @@
-const fs = require('fs');
+kconst fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 const TimecapsuleContract = artifacts.require("Timecapsule");

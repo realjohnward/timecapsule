@@ -39,10 +39,43 @@ contract Timecapsule {
                owner = msg.sender;
        }
 
-        // Get timestamp 
-        function getTimestamp() public returns (uint) {
-                return now;
-        }
+       // Add a new millionaire with encrypted address and net worth arguments
+       //function addSecret(bytes memory _encryptedAddress, bytes memory _encryptedSecret, bytes memory _encryptedTimestamp) public onlyOwner() {
+        //       Secret memory secret = Secret({
+        //               myAddress: _encryptedAddress,
+        //               mySecret: _encryptedSecret,
+        //               myTimestamp: _encryptedTimestamp
+        //       });
+        //       secrets.push(secret);
+        //       numSecrets++;
+       //}
+
+       //function getInfoForSecret(uint index)
+       //        public
+       //        view
+       //        returns (bytes memory, bytes memory, bytes memory)
+       //{
+       //        Secret memory secret = secrets[index];
+       //        bytes memory encryptedAddress = secret.myAddress;
+       //        bytes memory encryptedSecret = secret.mySecret;
+       //        bytes memory encryptedTimestamp = secret.myTimestamp;
+       //        return (encryptedAddress, encryptedSecret, encryptedTimestamp);
+       //}
+
+       /*
+       CALLABLE FUNCTION run in SGX to retrieve secret
+       */
+       //function getSecret(int64 nowTs, string memory _secret, int64 _timestamp)
+       //        public
+       //        pure
+       //        returns (string memory)
+       //{
+       //        if(_timestamp < nowTs){
+       //                return _secret;
+       //        } else {
+       //                return "N/A";
+       //        }
+       //}
 
        function revealSecret(address owner, string memory title, string memory secret) public onlyOwner() {
                 revealedSecrets[owner][title] = secret;

@@ -10,6 +10,13 @@ module.exports = {
             network_id: '4447' // Match ganache network id
         },
     },
+    //compilers: {
+    //	solc: {
+//	version: "^0.4.24"
+//		}
+//	},
+
+
     solc: {
         // Turns on the Solidity optimizer. For development the optimizer's
         // quite helpful, just remember to be careful, and potentially turn it
@@ -17,6 +24,7 @@ module.exports = {
         // see the Truffle 4.0.0 release notes.
         //
         // https://github.com/trufflesuite/truffle/releases/tag/v4.0.0
+
         optimizer: {
             enabled: true,
             runs: 200
