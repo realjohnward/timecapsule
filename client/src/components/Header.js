@@ -29,7 +29,7 @@ class Header extends Component {
                             variant="subtitle1"
                             color="inherit"
                         >
-                            Timecapsule Dapp
+                            Enigma Discovery Template DApp
                         </Typography>
                     </Toolbar>
                 </AppBar>

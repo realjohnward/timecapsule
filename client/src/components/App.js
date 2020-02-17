@@ -10,10 +10,9 @@ import { withStyles } from "@material-ui/core";
 import getEnigmaInit from "../utils/getEnigmaInit.js";
 // Imports - Components
 import Header from "./Header";
-import Timecapsule from './Timecapsule';
 import "../App.css";
 // Imports - Actions (Redux)
-import { initializeEnigma, initializeAccounts, deployTimecapsule } from '../actions';
+import { initializeEnigma, initializeAccounts } from '../actions';
 
 const styles = theme => ({
     root: {
@@ -40,11 +39,6 @@ class App extends Component {
         const accounts = await enigma.web3.eth.getAccounts();
         // Create redux action to initialize set state variable containing unlocked accounts
         this.props.initializeAccounts(accounts);
-        const secretContractCount = await enigma.enigmaContract.methods.countSecretContracts().call();
-        const deployedTimecapsuleAddress = (await enigma.enigmaContract.methods
-            .getSecretContractAddresses(secretContractCount - 1, secretContractCount).call())[0];
-        // Create redux action to set state variable containing deployed millionaires' problem secret contract address
-        this.props.deployTimecapsule(deployedTimecapsuleAddress);
     }
 
     render() {
@@ -55,16 +49,12 @@ class App extends Component {
                     <Message color="red">Enigma setup still loading...</Message>
                 </div>
             );
-        } else {
+        }
+        else {
             return (
-                <div className='App'>
-                    <Header />
-                    <br />
-                    <Container>
-                        <Paper>
-                            <Timecapsule />
-                        </Paper>
-                    </Container>
+                <div className="App">
+                    <Header/>
+                    <Message color="green">Enigma setup has loaded!</Message>
                 </div>
             );
         }
@@ -76,5 +66,6 @@ const mapStateToProps = (state) => {
 };
 
 export default connect(
-    mapStateToProps, { initializeEnigma, initializeAccounts, deployTimecapsule }
+    mapStateToProps,
+    { initializeEnigma, initializeAccounts }
 )(withStyles(styles)(App));

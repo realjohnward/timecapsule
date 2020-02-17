@@ -1,0 +1,6 @@
+#!/bin/bash
+{
+rm -r ./secret_contracts/timecapsule/target ./secret_contract/timecapsule/Cargo.lock
+} || {}
+clear
+nano ./secret_contracts/timecapsule/src/lib.rs

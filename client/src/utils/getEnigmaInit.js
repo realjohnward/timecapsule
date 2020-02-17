@@ -1,7 +1,7 @@
 import getWeb3 from './getWeb3';
 import { Enigma } from 'enigma-js';
 
-export default async() => {
+export default async () => {
     try {
         // Get network provider and web3 instance.
         const web3 = await getWeb3();
@@ -12,18 +12,18 @@ export default async() => {
             web3,
             EnigmaContract.networks['4447'].address,
             EnigmaTokenContract.networks['4447'].address,
-            'http://169.47.208.222:3333', {
+            'http://localhost:3346',
+            {
                 gas: 4712388,
                 gasPrice: 100000000000,
                 from: (await web3.eth.getAccounts())[0],
             },
         );
         enigma.admin();
-        enigma.setTaskKeyPair('cupcake');
-
         return enigma;
     } catch (error) {
         // Catch any errors for any of the above operations.
         console.log(error);
     }
 };
+
